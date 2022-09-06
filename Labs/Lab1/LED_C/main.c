@@ -1,19 +1,6 @@
 #include "stm32l476xx.h"
 
 
-uint32_t msTicks=0;
-void SysTick_Handler(void){
-msTicks++;
-}
-/*----------------------------------------------------------------------------
-delays number of tick Systicks (happens every 1 ms)
-*----------------------------------------------------------------------------*/
-void Delay (uint32_t dlyTicks) {
-uint32_t curTicks;
-curTicks = msTicks;
-while ((msTicks - curTicks) < dlyTicks);
-}
-
 int main(void){
 
 	// Enable High Speed Internal Clock (HSI = 16 MHz)
@@ -56,14 +43,14 @@ int main(void){
 		*/
 
 
-			GPIOB->MODER &= ~(3UL<<(2*2)); // Clear bits 4 and 5 for Pin 2 //2 * 2
-			GPIOB->MODER |= 1UL<<4; // Set bit 4, set Pin 2 as output
+		GPIOB->MODER &= ~(0x03<<(2*2)); // Clear bits 4 and 5 for Pin 2 
+		GPIOB->MODER |= 0x01<<4; // Set bit 4, set Pin 2 as output
 
 
-			GPIOB->OTYPER &= ~(1UL<<(2*1)); //sets to zero
-			// GPIOB->OTYPER |= 1UL<<(2*1);    //sets to 1 which would make PB2 Open Drain, which is not what we want
+		GPIOB->OTYPER &= ~(0x01<<(2*1)); //sets to zero
+			// GPIOB->OTYPER |= 0x01<<(2*1);    //sets to 1 which would make PB2 Open Drain, which is not what we want
 
-			GPIOB->PUPDR &= ~(3UL<<(2*2));
+		GPIOB->PUPDR &= ~(0x03<<(2*2));
 			//the and function sets the bits to 00 and that is the desired outcome so we dont need an or function
 
 
@@ -73,24 +60,28 @@ int main(void){
 		//GPIO E things
 		RCC->AHB2ENR |= RCC_AHB2ENR_GPIOEEN;     //Enable clock for port E
 		//each pin is 2 bits wide
-		GPIOE->MODER &= ~(3UL<<(2*8)); // clears pin 8 (format is 2*desired pin to clear)
-		GPIOE->MODER |= 1UL<<(2*8);
+		GPIOE->MODER &= ~(0x03<<(2*8)); // clears pin 8 (format is 2*desired pin to clear)
+		GPIOE->MODER |= 0x01<<(2*8);
 		//each pin is 1 bit wide
-		GPIOE->OTYPER &= ~(1UL<<(1*8)); // Cleared pin, because push-pull is 0 we don't need to set any bits
+		GPIOE->OTYPER &= ~(0x01<<(1*8)); // Cleared pin, because push-pull is 0 we don't need to set any bits
 
-		GPIOE->PUPDR &= ~(3UL<<(2*8));
+		GPIOE->PUPDR &= ~(0x03<<(2*8));
 		//the and function sets the bits to 00 and that is the desired outcome so we dont need an or function
+		
+		while(1){
+			  // Dead loop & program hangs here
+				int i = 0;
+				//turn on red light and green light
+				GPIOB->ODR |= 0x01<<(1*2);
+				GPIOE->ODR |= 0x01<<(1*8);
+				for(i =0; i< 1000000; i++);
+				//Delay
+				//Turn off red light and green light
+				 GPIOB->ODR &= ~(0x01<<(1*2));
+				 GPIOE->ODR &= ~(0x01UL<<(1*8));
+			 	for(i=0; i<1000000;i++);
+			
+		}
 
-  // Dead loop & program hangs here
-	while(1)(
-		//turn on red light and green light
-		GPIOB->ODR |= 1UL<<(1*2);
-		GPIOE->ODR |= 1UL<<(1*8);
-		//Delay
-		uint32_t blinkDelay = 2000; //unit is ms 1000ms = 1 sec
-		Delay(blinkDelay);
-		//Turn off red light and green light
-		GPIOB->ODR &= ~(1UL<<(1*2));
-		GPIOE->ODR &= ~(1UL<<(1*8));
-	)
-}
+	}
+
