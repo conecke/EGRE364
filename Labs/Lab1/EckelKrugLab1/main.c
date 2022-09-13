@@ -70,7 +70,7 @@ int main(void){
 		
 		while(1){
 			  // Dead loop & program hangs here
-				int i = 0;
+				volatile int i = 0;
 				//turn on red light and green light
 				GPIOB->ODR |= 0x01<<(1*2);
 				GPIOE->ODR |= 0x01<<(1*8);
