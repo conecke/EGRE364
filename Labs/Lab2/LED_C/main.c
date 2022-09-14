@@ -100,6 +100,27 @@ int main(void){
 	SysTick_Config(16000000/1000); //configures the system clock based on it being the 16MHz HSI clock to do a systick every milisecond
   while(1){
     leadLight();
+    /* Pseudocode
+    First Idea
+    Delay Strip delay
+    TrailLight (75% Duty Cycle)
+    Delay Strip delay
+    TrailLight (50% Duty Cycle)
+    Delay Strip delay
+    TrailLight (25% Duty Cycle)
+
+    ^
+    This wouldn't work, it would move one light at a time
+
+    Second Idea
+    One single function moves all of them, instead of the leading trailing distinction. 
+    Would take in an integer to decide the number of LEDs to use at a time. 
+    Have every Light after the first have their duty cycle reduced by 20% <-(Test by eye)
+    Manage duty cycle by having every on period for a given space be interrupted by off periods of 20%, and the number of those that 
+    activate are conditional on how far back from the lead the light is.                       
+      May be awkward looking to eye, if it is 80% on then short off, may want 
+      to figure out how to break up the intervals evenly (ex. 50%: 25% on -> 25% off -> 25% on -> 25% off)
+    */
   }
 
 
