@@ -1,8 +1,20 @@
 #include "stm32l476xx.h"
 
+uint32_t msTicks=0;
+void SysTick_Handler(void) {
+msTicks++;
+}
+/*----------------------------------------------------------------------------
+delays number of tick Systicks (happens every 1 ms)
+*----------------------------------------------------------------------------*/
+void Delay (uint32_t dlyTicks) {
+uint32_t curTicks;
+curTicks = msTicks;
+while ((msTicks - curTicks) < dlyTicks);
+}
 
 int main(void){
-
+	
 	// Enable High Speed Internal Clock (HSI = 16 MHz)
   RCC->CR |= ((uint32_t)RCC_CR_HSION);
 
@@ -43,7 +55,7 @@ int main(void){
 		*/
 
 
-		GPIOB->MODER &= ~(0x03<<(2*2)); // Clear bits 4 and 5 for Pin 2 
+		GPIOB->MODER &= ~(0x03<<(2*2)); // Clear bits 4 and 5 for Pin 2
 		GPIOB->MODER |= 0x01<<4; // Set bit 4, set Pin 2 as output
 
 
@@ -68,20 +80,24 @@ int main(void){
 		GPIOE->PUPDR &= ~(0x03<<(2*8));
 		//the and function sets the bits to 00 and that is the desired outcome so we dont need an or function
 		
+		SysTick_Config(16000000/1000);
+		
 		while(1){
+
 			  // Dead loop & program hangs here
 				volatile int i = 0;
 				//turn on red light and green light
 				GPIOB->ODR |= 0x01<<(1*2);
 				GPIOE->ODR |= 0x01<<(1*8);
-				for(i =0; i< 1000000; i++);
+
 				//Delay
+        Delay(500);
+
 				//Turn off red light and green light
 				 GPIOB->ODR &= ~(0x01<<(1*2));
 				 GPIOE->ODR &= ~(0x01UL<<(1*8));
-			 	for(i=0; i<1000000;i++);
-			
+			  Delay(500);
+
 		}
 
 	}
-
