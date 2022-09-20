@@ -5,8 +5,9 @@ void delayLED(uint32_t);
 void assign(uint32_t);
 void shiftLeft(uint32_t *);
 void shiftRight(uint32_t *);
-void leadLight();
-#define STRIP_DELAY_CNST 100
+void moveLight();
+#define STRIP_DELAY_CNST 200
+#define DIM_DELAY STRIP_DELAY_CNST/4;
 
 uint32_t msTicks=0; //Global variable to increment each clock cycle using systick
 
@@ -64,20 +65,32 @@ void assign(uint32_t t) {	//used to handle the pins being split across multiple 
   GPIOA->ODR |= (t & 0x00F);
 }
 
-void leadLight(){		//original function used to move the primary, full brightness light across the strip
-  uint32_t t;
-  t = 0x1<<9;
+void moveLight(){		//original function used to move the primary, full brightness light across the strip
+  uint32_t t[4];
+  t[0] = 0x1<<9;
   int i = 0;
-  for(i = 0; i < 10; i++){
-    assign(t);
-    delayLED(STRIP_DELAY_CNST);
-    shiftRight(&t);
+  for(i = 0; i < 13; i++){
+    assign(t[0]);
+		if (i == 2) t[3] = t[2];
+		if (i == 1) t[2] = t[1];
+		if (i == 0) t[1] = t[0];
+		delayLED(STRIP_DELAY_CNST);
+    shiftRight(&t[0]);
+		if (i == 2) t[0] |= t[3];
+		if (i == 1) t[0] |= t[2];
+		if (i == 0) t[0] |= t[1];
   }
-  t = 0x1;
-  for(i = 0; i < 10; i++){
-    assign(t);
+  t[0] = 0x1;
+  for(i = 0; i < 13; i++){
+    assign(t[0]);
     delayLED(STRIP_DELAY_CNST);
-    shiftLeft(&t);
+		if (i == 2) t[3] = t[2];
+		if (i == 1) t[2] = t[1];
+		if (i == 0) t[1] = t[0];
+    shiftLeft(&t[0]);
+		if (i == 2) t[0] |= t[3];
+		if (i == 1) t[0] |= t[2];
+		if (i == 0) t[0] |= t[1];
   }
 }
 int main(void){
@@ -99,7 +112,7 @@ int main(void){
   initAPins();
 	SysTick_Config(16000000/1000); //configures the system clock based on it being the 16MHz HSI clock to do a systick every milisecond
   while(1){
-    leadLight();
+    moveLight();
     /* Pseudocode
     First Idea
     Delay Strip delay

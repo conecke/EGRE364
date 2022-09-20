@@ -3,11 +3,11 @@
 <title>Static Call Graph - [.\Objects\project.axf]</title></head>
 <body><HR>
 <H1>Static Call Graph for image .\Objects\project.axf</H1><HR>
-<BR><P>#&#060CALLGRAPH&#062# ARM Linker, 6180002: Last Updated: Tue Sep 13 23:16:24 2022
+<BR><P>#&#060CALLGRAPH&#062# ARM Linker, 6180002: Last Updated: Tue Sep 20 16:49:51 2022
 <BR><P>
-<H3>Maximum Stack Usage =         40 bytes + Unknown(Functions without stacksize, Cycles, Untraceable Function Pointers)</H3><H3>
+<H3>Maximum Stack Usage =         56 bytes + Unknown(Functions without stacksize, Cycles, Untraceable Function Pointers)</H3><H3>
 Call chain for Maximum Stack Depth:</H3>
-__rt_entry_main &rArr; main &rArr; leadLight &rArr; delayLED
+__rt_entry_main &rArr; main &rArr; moveLight &rArr; delayLED
 <P>
 <H3>
 Functions with no stack information
@@ -238,8 +238,8 @@ Global Symbols
 <P><STRONG><a name="[98]"></a>__rt_entry_postsh_1</STRONG> (Thumb, 0 bytes, Stack size unknown bytes, __rtentry2.o(.ARM.Collect$$rtentry$$00000009))
 
 <P><STRONG><a name="[65]"></a>__rt_entry_main</STRONG> (Thumb, 0 bytes, Stack size unknown bytes, __rtentry2.o(.ARM.Collect$$rtentry$$0000000D))
-<BR><BR>[Stack]<UL><LI>Max Depth = 40 + Unknown Stack Size
-<LI>Call Chain = __rt_entry_main &rArr; main &rArr; leadLight &rArr; delayLED
+<BR><BR>[Stack]<UL><LI>Max Depth = 56 + Unknown Stack Size
+<LI>Call Chain = __rt_entry_main &rArr; main &rArr; moveLight &rArr; delayLED
 </UL>
 <BR>[Calls]<UL><LI><a href="#[67]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;exit
 <LI><a href="#[66]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;main
@@ -617,62 +617,62 @@ Global Symbols
 <P><STRONG><a name="[9]"></a>SysTick_Handler</STRONG> (Thumb, 16 bytes, Stack size 0 bytes, main.o(.text.SysTick_Handler))
 <BR>[Address Reference Count : 1]<UL><LI> startup_stm32l476xx.o(RESET)
 </UL>
-<P><STRONG><a name="[72]"></a>assign</STRONG> (Thumb, 68 bytes, Stack size 4 bytes, main.o(.text.assign))
+<P><STRONG><a name="[74]"></a>assign</STRONG> (Thumb, 68 bytes, Stack size 4 bytes, main.o(.text.assign))
 <BR><BR>[Stack]<UL><LI>Max Depth = 4<LI>Call Chain = assign
 </UL>
-<BR>[Called By]<UL><LI><a href="#[71]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;leadLight
+<BR>[Called By]<UL><LI><a href="#[73]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;moveLight
 </UL>
 
-<P><STRONG><a name="[73]"></a>delayLED</STRONG> (Thumb, 46 bytes, Stack size 8 bytes, main.o(.text.delayLED))
+<P><STRONG><a name="[75]"></a>delayLED</STRONG> (Thumb, 46 bytes, Stack size 8 bytes, main.o(.text.delayLED))
 <BR><BR>[Stack]<UL><LI>Max Depth = 8<LI>Call Chain = delayLED
 </UL>
-<BR>[Called By]<UL><LI><a href="#[71]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;leadLight
+<BR>[Called By]<UL><LI><a href="#[73]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;moveLight
 </UL>
 
-<P><STRONG><a name="[77]"></a>initAPins</STRONG> (Thumb, 124 bytes, Stack size 4 bytes, main.o(.text.initAPins))
+<P><STRONG><a name="[72]"></a>initAPins</STRONG> (Thumb, 124 bytes, Stack size 4 bytes, main.o(.text.initAPins))
 <BR><BR>[Stack]<UL><LI>Max Depth = 4<LI>Call Chain = initAPins
 </UL>
 <BR>[Called By]<UL><LI><a href="#[66]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;main
 </UL>
 
-<P><STRONG><a name="[76]"></a>initEPins</STRONG> (Thumb, 132 bytes, Stack size 4 bytes, main.o(.text.initEPins))
+<P><STRONG><a name="[71]"></a>initEPins</STRONG> (Thumb, 132 bytes, Stack size 4 bytes, main.o(.text.initEPins))
 <BR><BR>[Stack]<UL><LI>Max Depth = 4<LI>Call Chain = initEPins
 </UL>
 <BR>[Called By]<UL><LI><a href="#[66]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;main
 </UL>
 
-<P><STRONG><a name="[71]"></a>leadLight</STRONG> (Thumb, 104 bytes, Stack size 16 bytes, main.o(.text.leadLight))
-<BR><BR>[Stack]<UL><LI>Max Depth = 24<LI>Call Chain = leadLight &rArr; delayLED
-</UL>
-<BR>[Calls]<UL><LI><a href="#[72]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;assign
-<LI><a href="#[75]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;shiftLeft
-<LI><a href="#[74]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;shiftRight
-<LI><a href="#[73]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;delayLED
-</UL>
-<BR>[Called By]<UL><LI><a href="#[66]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;main
-</UL>
-
 <P><STRONG><a name="[66]"></a>main</STRONG> (Thumb, 116 bytes, Stack size 16 bytes, main.o(.text.main))
-<BR><BR>[Stack]<UL><LI>Max Depth = 40<LI>Call Chain = main &rArr; leadLight &rArr; delayLED
+<BR><BR>[Stack]<UL><LI>Max Depth = 56<LI>Call Chain = main &rArr; moveLight &rArr; delayLED
 </UL>
-<BR>[Calls]<UL><LI><a href="#[71]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;leadLight
-<LI><a href="#[76]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;initEPins
-<LI><a href="#[77]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;initAPins
+<BR>[Calls]<UL><LI><a href="#[73]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;moveLight
+<LI><a href="#[71]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;initEPins
+<LI><a href="#[72]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;initAPins
 <LI><a href="#[6f]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;SysTick_Config
 </UL>
 <BR>[Called By]<UL><LI><a href="#[65]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;__rt_entry_main
 </UL>
 
-<P><STRONG><a name="[75]"></a>shiftLeft</STRONG> (Thumb, 16 bytes, Stack size 4 bytes, main.o(.text.shiftLeft))
-<BR><BR>[Stack]<UL><LI>Max Depth = 4<LI>Call Chain = shiftLeft
+<P><STRONG><a name="[73]"></a>moveLight</STRONG> (Thumb, 288 bytes, Stack size 32 bytes, main.o(.text.moveLight))
+<BR><BR>[Stack]<UL><LI>Max Depth = 40<LI>Call Chain = moveLight &rArr; delayLED
 </UL>
-<BR>[Called By]<UL><LI><a href="#[71]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;leadLight
+<BR>[Calls]<UL><LI><a href="#[74]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;assign
+<LI><a href="#[77]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;shiftLeft
+<LI><a href="#[76]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;shiftRight
+<LI><a href="#[75]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;delayLED
+</UL>
+<BR>[Called By]<UL><LI><a href="#[66]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;main
 </UL>
 
-<P><STRONG><a name="[74]"></a>shiftRight</STRONG> (Thumb, 16 bytes, Stack size 4 bytes, main.o(.text.shiftRight))
+<P><STRONG><a name="[77]"></a>shiftLeft</STRONG> (Thumb, 16 bytes, Stack size 4 bytes, main.o(.text.shiftLeft))
+<BR><BR>[Stack]<UL><LI>Max Depth = 4<LI>Call Chain = shiftLeft
+</UL>
+<BR>[Called By]<UL><LI><a href="#[73]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;moveLight
+</UL>
+
+<P><STRONG><a name="[76]"></a>shiftRight</STRONG> (Thumb, 16 bytes, Stack size 4 bytes, main.o(.text.shiftRight))
 <BR><BR>[Stack]<UL><LI>Max Depth = 4<LI>Call Chain = shiftRight
 </UL>
-<BR>[Called By]<UL><LI><a href="#[71]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;leadLight
+<BR>[Called By]<UL><LI><a href="#[73]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;moveLight
 </UL>
 
 <P><STRONG><a name="[60]"></a>_fp_init</STRONG> (Thumb, 26 bytes, Stack size 0 bytes, fpinit.o(x$fpl$fpinit))
