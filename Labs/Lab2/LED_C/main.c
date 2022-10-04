@@ -6,7 +6,7 @@ void assign(uint32_t);
 void shiftLeft(uint32_t *);
 void shiftRight(uint32_t *);
 void moveLight();
-#define STRIP_DELAY_CNST 10
+#define STRIP_DELAY_CNST 5
 #define DIM_DELAY 1
 
 uint32_t msTicks=0; //Global variable to increment each clock cycle using systick
@@ -71,29 +71,29 @@ void moveLight(){		//original function used to move the primary, full brightness
   int i = 0, j= 0;
   for(i = 0; i < 12; i++){
     if (i == 0) assign(t[0]);
-		delayLED(STRIP_DELAY_CNST);
+	delayLED(STRIP_DELAY_CNST);
     shiftRight(&t[0]);
-		shiftRight(&t[1]);
-		shiftRight(&t[2]);
-		shiftRight(&t[3]);
-		if (i == 0){
-			t[1] = t[0]<<1;
-			t[1] |= t[1]>>1;
-			t[2] = t[1]<<1;
-			t[2] |= t[2]>>1;
-			t[3] = t[2]<<1;
-			t[3] |= t[3]>>1;
-		}
-		for(j = 0; j < 50; j++){
-		assign(t[0]);
-		delayLED(DIM_DELAY);
-		assign(t[1]);
-		delayLED(DIM_DELAY);
-		assign(t[2]);
-		delayLED(DIM_DELAY);
-		assign(t[3]);
-		delayLED(DIM_DELAY);
-		}
+	shiftRight(&t[1]);
+	shiftRight(&t[2]);
+	shiftRight(&t[3]);
+	if (i == 0){
+		t[1] = t[0]<<1;
+		t[1] |= t[1]>>1;
+		t[2] = t[1]<<1;
+		t[2] |= t[2]>>1;
+		t[3] = t[2]<<1;
+		t[3] |= t[3]>>1;
+	}
+	for(j = 0; j < 30; j++){
+	assign(t[0]);
+	delayLED(DIM_DELAY);
+	assign(t[1]);
+	delayLED(DIM_DELAY);
+	assign(t[2]);
+	delayLED(DIM_DELAY);
+	assign(t[3]);
+	delayLED(DIM_DELAY);
+	}
 	
   }
 	
@@ -117,7 +117,7 @@ void moveLight(){		//original function used to move the primary, full brightness
 			t[3] = t[2];
 			t[3] |= (t[3] >> 1);
 		}
-		for (j = 0; j < 50; j++){
+		for (j = 0; j < 30; j++){
 			assign(t[3]);
 			delayLED(DIM_DELAY);
 			assign(t[2]);
@@ -147,7 +147,7 @@ int main(void){
   while ((RCC->CFGR & (uint32_t)RCC_CFGR_SWS) == 0 ) {;}
 
 	initEPins();
-  initAPins();
+  	initAPins();
 	SysTick_Config(16000000/1000); //configures the system clock based on it being the 16MHz HSI clock to do a systick every milisecond
   while(1){
     moveLight();
@@ -191,9 +191,6 @@ int main(void){
 		*/
 		
 		}
-		
-		
-		
 		
   }
 
