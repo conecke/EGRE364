@@ -161,7 +161,7 @@ int main(void){
 			assign(digits[i]);
 			while (GPIOA->IDR & 0x01<<3 || GPIOA->IDR & 0x01 <<5);
 			delay(300);
-			/*
+			/* Segment Display Check Code
 			for(i = 0; i < 10; i++){
 				assign(digits[i]);
 				delay(1000);
