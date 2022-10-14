@@ -885,13 +885,15 @@ ARM Macro Assembler    Page 14
               00000400 
               00000200 
               00000000 
-Command Line: --debug --xref --diag_suppress=9931 --cpu=Cortex-M4.fp --apcs=int
-erwork --depend=.\objects\startup_stm32l476xx.d -o.\objects\startup_stm32l476xx
-.o -IC:\EGRE364Fall2016\Code\STM32L4_Lab_Template_Assembly\RTE -IC:\Keil_v5\ARM
-\PACK\ARM\CMSIS\4.5.0\CMSIS\Include -IC:\Keil_v5\ARM\PACK\Keil\STM32L4xx_DFP\1.
-2.0\Device\Include --predefine="__EVAL SETA 1" --predefine="__UVISION_VERSION S
-ETA 521" --predefine="_RTE_ SETA 1" --predefine="STM32L476xx SETA 1" --list=.\l
-istings\startup_stm32l476xx.lst startup_stm32l476xx.s
+Command Line: --debug --xref --diag_suppress=9931 --cpu=Cortex-M4.fp.sp --depen
+d=.\objects\startup_stm32l476xx.d -o.\objects\startup_stm32l476xx.o -I.\RTE\_Ta
+rget_1 -IC:\Users\conne\AppData\Local\Arm\Packs\ARM\CMSIS\5.9.0\CMSIS\Core\Incl
+ude -IC:\Users\conne\AppData\Local\Arm\Packs\Keil\STM32L4xx_DFP\2.6.1\Drivers\C
+MSIS\Device\ST\STM32L4xx\Include -IC:\Users\conne\AppData\Local\Arm\Packs\Keil\
+STM32L4xx_DFP\2.6.1\Device\Include --predefine="__EVAL SETA 1" --predefine="__U
+VISION_VERSION SETA 537" --predefine="_RTE_ SETA 1" --predefine="STM32L476xx SE
+TA 1" --predefine="_RTE_ SETA 1" --list=.\listings\startup_stm32l476xx.lst star
+tup_stm32l476xx.s
 
 
 
