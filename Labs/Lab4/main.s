@@ -33,6 +33,7 @@ __main	PROC
 	; r1 - Stores base address for specific register or clock port
 	; r2 - Used as a buffer for instructions
 	;
+	; r6 - stores the value of the input
 	; r7 - stores the mask for which LED segments should be turned on
 
 ;Segment Pattern initialization	
@@ -56,6 +57,21 @@ __main	PROC
 
 
 ;Clock Setup
+	;System clock setup in C
+	;	// Enable High Speed Internal Clock (HSI = 16 MHz)
+	;	RCC->CR |= ((uint32_t)RCC_CR_HSION);
+
+	;	// wait until HSI is ready
+	;	while ( (RCC->CR & (uint32_t) RCC_CR_HSIRDY) == 0 ) {;}
+
+	;	// Select HSI as system clock source
+	;	RCC->CFGR &= (uint32_t)((uint32_t)~(RCC_CFGR_SW));
+	;	RCC->CFGR |= (uint32_t)RCC_CFGR_SW_HSI;  //01: HSI16 oscillator used as system clock
+
+	;	// Wait till HSI is used as system clock source
+	;	while ((RCC->CFGR & (uint32_t)RCC_CFGR_SWS) == 0 ) {;}
+
+
 	; Enable the clock to GPIO Port A	
 	LDR r0, =RCC_BASE   				; Stores base clock address in r0
 	LDR r1, [r0, #RCC_AHB2ENR]			; Stores the clock enable register in r1;
@@ -157,8 +173,15 @@ __main	PROC
 	LDR r1, [r0, #GPIO_PUPDR]			; Stores the base address for pupdr register in r1
 	BIC r1, r1, #(0x001)				; Clears pin 0
 	STR r1, [r0, #GPIO_PUPDR]			; Stores back to memory
-
-
+;Delay setup
+	LDR	r1, =SYSTICK_CONTROLR
+	LDR r0, [r1]
+	ORR	r0, #0x07 
+	STR	r0, [r1]
+	
+	LDR r0,=SYSTICK_RVR 
+	LDR r1, =0x3E80
+	STR r1,  [r0]
 ;Test Code
 	;r0 A Base
 	;r1 A ODR base
@@ -223,5 +246,35 @@ assign:
 	BX LR
 
 delay:
-	;Delay function, delays by the value stored in r7
-		
+	;Delay function, delays by the value stored in r5
+	;3E80 should be setup value for clock
+
+input:
+	;Function to read the input from the joystick
+	;Input in C
+		;while (1){
+			;uint32_t data = GPIOA->IDR;
+			;if ((data & (0x1 << 3))){
+			;	return 1;
+			;}
+			;else if ((data & (0x01 << 5))){
+			;	return -1;
+			;}
+		;}
+		LDR r0, =GPIOA_BASE
+start	LDR r1, [r0, GPIO_IDR]
+		TST r1, #0x1000
+		BEQ branch1
+		TST r1, #0x100000
+		BEQ branch2
+		B start
+
+branch1
+		LDR r6, =0x0
+		BX LR
+branch2
+		LDR r6, =0x1
+		BX LR
+
+
+	

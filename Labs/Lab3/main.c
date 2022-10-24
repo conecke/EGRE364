@@ -26,7 +26,6 @@ void initAPins(){			//Sets up port A pins 3 and 5 as output, push-pull, no-pull 
 	//GPIO A things
 	RCC->AHB2ENR |= RCC_AHB2ENR_GPIOAEN;     //Enable clock for port A
 	int pinOffset = 0;
-	
 
 	//each pin is 2 bits wide
 	GPIOA->MODER &= ~(0x03<<(2*3)); //Clears GIPIOA Mode for Pin 3
@@ -40,10 +39,7 @@ void initAPins(){			//Sets up port A pins 3 and 5 as output, push-pull, no-pull 
 	
 	GPIOA->PUPDR |= (0x02 << (2*3)); //Sets pin 3 to pull down
 	GPIOA->PUPDR |= (0x02 << (2*5)); //Sets pin 5 to pull down
-	
-
-
- 
+	 
 }
 void initHPins(){			//Sets up port A pins 0-3 as output, push-pull, no-pull up pulldown
   //GPIO A things
@@ -53,7 +49,6 @@ void initHPins(){			//Sets up port A pins 0-3 as output, push-pull, no-pull up p
     //each pin is 2 bits wide
     GPIOH->MODER &= ~(0x03<<(2*pinOffset)); // clears pin 10 (format is 2*desired pin to clear)
     GPIOH->MODER |= 0x01<<(2*pinOffset); //sets pin 10 as output
-
     //each pin is 1 bit wide
     GPIOH->OTYPER &= ~(0x01<<(1*pinOffset)); // Cleared pin, because push-pull is 0 we don't need to set any bits
     //each pin is 2 bits wide
@@ -69,7 +64,6 @@ void initEPins(){			//Sets up port E pins 10-15 as output, push-pull, no-pull up
     //each pin is 2 bits wide
     GPIOE->MODER &= ~(0x03<<(2*pinOffset)); // clears pin 10 (format is 2*desired pin to clear)
     GPIOE->MODER |= 0x01<<(2*pinOffset); //sets pin 10 as output
-
     //each pin is 1 bit wide
     GPIOE->OTYPER &= ~(0x01<<(1*pinOffset)); // Cleared pin, because push-pull is 0 we don't need to set any bits
     //each pin is 2 bits wide
@@ -86,10 +80,10 @@ void delay(uint32_t timeValue){	//delay function using systick that waits timeVa
 
 void assign(uint32_t t) {	//used to handle the pins being split across multiple ports
 	
-  GPIOE->ODR &= ~(0xFC00);
-  GPIOE->ODR |= (t)<<10;
+	GPIOE->ODR &= ~(0xFC00);
+	GPIOE->ODR |= (t)<<10;
 	GPIOH->ODR &= ~(0x0001);
-  if (((t<<25)>>25) >> 6) GPIOH->ODR |= (0x1);
+	if (t >> 6) GPIOH->ODR |= (0x1);
 
 }
 
@@ -103,9 +97,7 @@ int inputVal(){
 		else if ((data & (0x01 << 5))){
 			return -1;
 		}
-
 	}
-	
 }
     
 int main(void){
@@ -122,7 +114,6 @@ int main(void){
 
   // Wait till HSI is used as system clock source
   while ((RCC->CFGR & (uint32_t)RCC_CFGR_SWS) == 0 ) {;}
-
 
   initAPins();
   initEPins();
@@ -167,14 +158,7 @@ int main(void){
 				delay(1000);
 			}
 			*/
-	}
-	
-	
-    
-	
-		
- 
-
+	}	
 }
 
 
