@@ -1,16 +1,10 @@
-;******************** (C) Yifeng ZHU *******************************************
+;******************** Conner Eckel and Adam Krug *******************************************
 ; @file    main.s
-; @author  Yifeng Zhu
-; @date    May-17-2015
+; @author  Conner Eckel and Adam Krug
+; @date    October-24-2022
 ; @note
-;           This code is for the book "Embedded Systems with ARM Cortex-M 
-;           Microcontrollers in Assembly Language and C, Yifeng Zhu, 
-;           ISBN-13: 978-0982692639, ISBN-10: 0982692633
-; @attension
-;           This code is provided for education purpose. The author shall not be 
-;           held liable for any direct, indirect or consequential damages, for any 
-;           reason whatever. More information can be found from book website: 
-;           http:;www.eece.maine.edu/~zhu/book
+;           This code is for the EGRE 364 Class at VCU, specifically for lab 4, which is
+;			about working in assembly to enable an updown counter
 ;*******************************************************************************
 
 	INCLUDE core_cm4_constants.s		; Load Constant Definitions
@@ -19,34 +13,44 @@
 	AREA    main, CODE, READONLY
 	EXPORT	__main				; make __main visible to linker
 	ENTRY			
-
+SysTick_Handler PROC
+	export SysTick_Handler
+	ADD r5, #0x1
+	BX LR
+	ENDP
 
 			
-__main	PROC
-	
-
-
+__main	PROC	
 
 
 ;Register usage:
 	; r0 - Stores base address for Port or Clock
 	; r1 - Stores base address for specific register or clock port
 	; r2 - Used as a buffer for instructions
-	;
+	; r3 - reserved
+	; r4 - delay value
+	; r5 - used for the delay function
 	; r6 - stores the value of the input
 	; r7 - stores the mask for which LED segments should be turned on
 
 ;Segment Pattern initialization	
-	digit0 EQU 0x3F
-	digit1 EQU 0x06
-	digit2 EQU 0x5B 
-	digit3 EQU 0x4F 
-	digit4 EQU 0x66
-	digit5 EQU 0x6D 
-	digit6 EQU 0x7D 
-	digit7 EQU 0x07 
-	digit8 EQU 0x7F
-	digit9 EQU 0x6F 
+digit0 EQU 0x3F
+digit1 EQU 0x06
+digit2 EQU 0x5B 
+digit3 EQU 0x4F 
+digit4 EQU 0x66
+digit5 EQU 0x6D 
+digit6 EQU 0x7D 
+digit7 EQU 0x07 
+digit8 EQU 0x7F
+digit9 EQU 0x6F
+
+STK_BASE EQU (0xE000E010)
+STK_CTRL EQU 0x00
+STK_LOAD EQU 0x04
+STK_VAL EQU 0x08
+STK_CALIB EQU 0x0C
+
 
 ;Example Code for Clock from template
     ;Enable the clock to GPIO Port B	
@@ -70,7 +74,11 @@ __main	PROC
 
 	;	// Wait till HSI is used as system clock source
 	;	while ((RCC->CFGR & (uint32_t)RCC_CFGR_SWS) == 0 ) {;}
-
+	; Enable GPIO clock
+	LDR		R1, =RCC_AHB1ENR	;Pseudo-load address in R1
+	LDR		R0, [R1]			;Copy contents at address in R1 to R0
+	ORR.W 	R0, #0x08			;Bitwise OR entire word in R0, result in R0
+	STR		R0, [R1]			;Store R0 contents to address in R1
 
 	; Enable the clock to GPIO Port A	
 	LDR r0, =RCC_BASE   				; Stores base clock address in r0
@@ -116,12 +124,13 @@ __main	PROC
 	; Mode Register Port A
 	LDR r0, =GPIOA_BASE 				; Stores the port A base address in r0
 	LDR r1, [r0, #GPIO_MODER]			; Stores the base address for mode register in r1
-	LDR r2, =0xD0						; Buffering into r2
+	LDR r2, =0xC0						; Buffering into r2
 	BIC r1, r1,  r2						; MODER 2 bits wide so this clears pin 3 of the mode register (3*2)
-	ORR r1, r1,  r2						; this sets pin3 of the mode register to 01, which is output (3*2)
-	LDR r2, =0xD00						; Buffering into r2
+	;ORR r1, r1,  r2						; this sets pin3 of the mode register to 01, which is output (3*2)
+	STR r1, [r0, #GPIO_MODER]			; This stores it back to memory
+	LDR r2, =0xC00						; Buffering into r2
 	BIC r1, r1, r2						; MODER 2 bits wide so this clears pin 5 of the mode register (5*2)
-	ORR r1, r1,  r2						; this sets pin5 of the mode register to 01, which is output (5*2)
+	;ORR r1, r1,  r2						; this sets pin5 of the mode register to 01, which is output (5*2)
 	STR r1, [r0, #GPIO_MODER]			; This stores it back to memory
 
 	; Mode Register Port E
@@ -157,7 +166,7 @@ __main	PROC
 	; PUPDR port A
 	LDR r0, =GPIOA_BASE					; Stores the port A base address in r0
 	LDR r1, [r0, #GPIO_PUPDR]			; Stores the base address for pupdr register in r1
-	BIC r1, r1, #(0xDD0)				; Clears pin 3 and pin 5
+	BIC r1, r1, #(0xCC0)				; Clears pin 3 and pin 5
 	ORR r1, r1, #(0x880)				; Sets pin 3 and pin 5 to pull down
 	STR r1, [r0, #GPIO_PUPDR]			; Stores back to memory
 
@@ -173,108 +182,197 @@ __main	PROC
 	LDR r1, [r0, #GPIO_PUPDR]			; Stores the base address for pupdr register in r1
 	BIC r1, r1, #(0x001)				; Clears pin 0
 	STR r1, [r0, #GPIO_PUPDR]			; Stores back to memory
-;Delay setup
-	LDR	r1, =SYSTICK_CONTROLR
-	LDR r0, [r1]
-	ORR	r0, #0x07 
-	STR	r0, [r1]
-	
-	LDR r0,=SYSTICK_RVR 
-	LDR r1, =0x3E80
-	STR r1,  [r0]
+;Delay Setup	
+	LDR r0, =STK_BASE
+	LDR r1, [r0, #STK_CTRL]
+	ORR r2, r1, #(0x7)
+	STR r2, [r1]
+
+	LDR r1, [r0, #STK_LOAD]
+	LDR r2, =0x007A1200
+	STR r2, [r1]
+
+
 ;Test Code
-	;r0 A Base
-	;r1 A ODR base
+	;r0 Base
+	;r1 ODR base
 	;r2 Buffer Register
-	;r3	E Base
-	;r4 E ODR base
-	;r5 H Base
-	;r6 H ODR base
 		
 	;Turn on all segments test
-	LDR r0, =GPIOA_BASE					; Loads port A into r0
-	LDR r3, =GPIOE_BASE					; Loads port E into r3
-	LDR r5, =GPIOH_BASE					; Loads port H into r5
-	LDR r4, [r3, #GPIO_ODR]				; Loads E ODR into r4
-	LDR r2, =0xFD00						; Buffering Value
-	ORR r4, r4, r2						; Sets LED A-F on
-	STR r4, [r3, #GPIO_ODR]				; Stores back into memory
-	LDR r6, [r5, #GPIO_ODR]				; Loads H ODR into r1
-	ORR r6, r6, #0x1					; Sets LED G on
-	STR r6, [r5, #GPIO_ODR]				; Stores back into memory
-
-	
-
-
-
-;end stuff
-
-;Use BL to jump to assign function, BX LR to get back to main
+	;LDR r0, =GPIOE_BASE					; Loads port E into r0
+	;LDR r1, [r0, #GPIO_ODR]				; Loads E ODR into r4
+	;LDR r2, =0xFD00						; Buffering Value
+	;ORR r1, r1, r2						; Sets LED A-F on
+	;STR r1, [r0, #GPIO_ODR]				; Stores back into memory
+	;LDR r0, =GPIOH_BASE					; Loads port H into r5
+	;LDR r1, [r0, #GPIO_ODR]				; Loads H ODR into r1
+	;ORR r1, r1, #0x1					; Sets LED G on
+	;STR r1, [r0, #GPIO_ODR]				; Stores back into memory
+	LDR r4, =0xFFF
 	LDR r7, =digit0
 	BL assign
-
-
+	BL delay
+mainloopstart
+	BL input
+	CMP r6, #(0x00)
+	BEQ next
+	CMP r6, #(0x01)
+	BEQ prev
+always
+	BL assign
+	BL delay
+	
+	
+	B mainloopstart
 stop 	B 		stop     		; dead loop & program hangs here
 
-	ENDP
-					
-	ALIGN			
+next
+	CMP r7, #digit0
+	LDREQ r7, =digit1
+	BEQ always
+	CMP r7, #digit1
+	LDREQ r7, =digit2
+	BEQ always
+	CMP r7, #digit2
+	LDREQ r7, =digit3
+	BEQ always
+	CMP r7, #digit3
+	LDREQ r7, =digit4
+	BEQ always
+	CMP r7, #digit4
+	LDREQ r7, =digit5
+	BEQ always
+	CMP r7, #digit5
+	LDREQ r7, =digit6
+	BEQ always
+	CMP r7, #digit6
+	LDREQ r7, =digit7
+	BEQ always
+	CMP r7, #digit7
+	LDREQ r7, =digit8
+	BEQ always
+	CMP r7, #digit8
+	LDREQ r7, =digit9
+	BEQ always
+	CMP r7, #digit9
+	LDREQ r7, =digit0
+	BEQ always
+	B always
+prev
+	CMP r7, #digit0
+	LDREQ r7, =digit9
+	BEQ always
+	CMP r7, #digit9
+	LDREQ r7, =digit8
+	BEQ always
+	CMP r7, #digit8
+	LDREQ r7, =digit7
+	BEQ always
+	CMP r7, #digit7
+	LDREQ r7, =digit6
+	BEQ always
+	CMP r7, #digit6
+	LDREQ r7, =digit5
+	BEQ always
+	CMP r7, #digit5
+	LDREQ r7, =digit4
+	BEQ always
+	CMP r7, #digit4
+	LDREQ r7, =digit3
+	BEQ always
+	CMP r7, #digit3
+	LDREQ r7, =digit2
+	BEQ always
+	CMP r7, #digit2
+	LDREQ r7, =digit1
+	BEQ always
+	CMP r7, #digit1
+	LDREQ r7, =digit0
+	BEQ always
+	B always
 
-	AREA    myData, DATA, READWRITE
-	ALIGN
-;array	DCD   1, 2, 3, 4
-	END
-
-assign:
-	;Assign function - Needs r7 to be set to bit mask for correct digit
-	;assign in C:
-		;GPIOE->ODR &= ~(0xFC00);
-		;GPIOE->ODR |= (t)<<10;
-		;GPIOH->ODR &= ~(0x0001);
-		;if (t >> 6) GPIOH->ODR |= (0x1);
-	;
+assign 
+		;Assign function - Needs r7 to be set to bit mask for correct digit
+		;assign in C:
+			;GPIOE->ODR &= ~(0xFC00);
+			;GPIOE->ODR |= (t)<<10;
+			;GPIOH->ODR &= ~(0x0001);
+			;if (t >> 6) GPIOH->ODR |= (0x1);
+		;
 	LDR r0, =GPIOE_BASE
-	LDR r1, [r0, GPIO_ODR]
+	LDR r1, [r0, #GPIO_ODR]
 	LDR r2, =0xFC00
 	BIC r1, r1, r2
-	ORR r1, r1, r7, LSL 10
+	ORR r1, r1, r7, LSL #10
+	STR r1, [r0, #GPIO_ODR]
 	LDR r0, =GPIOH_BASE
-	LDR r1, [r0, GPIO_ODR]
+	LDR r1, [r0, #GPIO_ODR]
 	LDR r2, =0x0001
 	BIC r1, r1, r2
-	ORR r1, r1, r7, LSR 6
+	ORR r1, r1, r7, LSR #6
+	STR r1, [r0, #GPIO_ODR]
 	BX LR
 
-delay:
-	;Delay function, delays by the value stored in r5
-	;3E80 should be setup value for clock
+delay ; Delay function from lecture
+	POP {r1}
+	LDR r1, =100000   ;initial value for loop counter
+again  NOP  ;execute two no-operation instructions
+	NOP
+	subs r1, #1
+	bne again ; if not equal (Z?0)
+	POP {r1}
+	BX LR
 
-input:
-	;Function to read the input from the joystick
-	;Input in C
-		;while (1){
-			;uint32_t data = GPIOA->IDR;
-			;if ((data & (0x1 << 3))){
-			;	return 1;
+		
+	;Delay function I wrote, delays by the value stored in r4 in ms
+delayStart
+	CMP r5, r4
+	BEQ out
+	ADDNE r5, #0x1
+	B delayStart
+out	MOV r5, #0x0
+	BX LR
+
+input
+		;Function to read the input from the joystick
+		;Input in C
+			;while (1){
+				;uint32_t data = GPIOA->IDR;
+				;if ((data & (0x1 << 3))){
+				;	return 1;
+				;}
+				;else if ((data & (0x01 << 5))){
+				;	return -1;
+				;}
 			;}
-			;else if ((data & (0x01 << 5))){
-			;	return -1;
-			;}
-		;}
 		LDR r0, =GPIOA_BASE
-start	LDR r1, [r0, GPIO_IDR]
-		TST r1, #0x1000
+		LDR r2, =0xFFFFFFFF
+		EOR r2, r2, #0x28
+start	LDR r1, [r0, #GPIO_IDR]
+		BIC r1, r1, r2
+		CMP r1, #0x08
 		BEQ branch1
-		TST r1, #0x100000
+		CMP r1, #0x20
 		BEQ branch2
+		MOV r6, #0x02
 		B start
 
 branch1
+		MOV r0, r6
 		LDR r6, =0x0
+		CMP r0, r6
+		BEQ input
 		BX LR
 branch2
+		MOV r0, r6
 		LDR r6, =0x1
+		CMP r0, r6
+		BEQ input
 		BX LR
 
-
-	
+;end stuff
+	ENDP
+	ALIGN			
+	AREA    myData, DATA, READWRITE
+	ALIGN
+	END
